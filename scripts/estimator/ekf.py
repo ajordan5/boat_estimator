@@ -2,6 +2,9 @@ import numpy as np
 from scipy.spatial.transform import Rotation as R
 
 def propagate(belief,RProcess,RInputs,ft,At,Bt,dt):
+     """Estimate Propogation"""
+
+     # Increment the equations of motion by one time step
      belief.p = belief.p + ft.dp*dt
      belief.vr = belief.vr + ft.dvr*dt
      belief.psi = belief.psi + ft.dpsi*dt
@@ -10,9 +13,13 @@ def propagate(belief,RProcess,RInputs,ft,At,Bt,dt):
      Ad = np.identity(belief.m) + At*dt
      Bd = Bt*dt
 
+     # Update covariance matrix for the states
      belief.P = Ad@belief.P@Ad.T + Bd@RInputs@Bd.T + RProcess*dt**2
 
 def update(belief,Qt,zt,ht,Ct):
+     """Extended Kalman Filter update based on sensor readings (zt) and sensor model (ht)"""
+
+     # Kalman gain for the sensors
      Lt = belief.P@Ct.T@np.linalg.inv(Ct@belief.P@Ct.T+Qt)
      dx = Lt@(zt-ht)
      belief.p = belief.p + dx[0:3]
@@ -20,9 +27,12 @@ def update(belief,Qt,zt,ht,Ct):
      belief.psi = belief.psi + dx[6]
      belief.vb = belief.vb + dx[7:10]
 
+     # Update covariance matrix for the states
      belief.P = (np.identity(belief.m) - Lt@Ct)@belief.P
 
 def update_dynamic_model(belief,ut):
+     """Update boat dynamic model based on current state estimates. Used during the propogate step"""
+     
      euler = np.array([ut.phi,ut.theta,belief.psi])
      Rb2i = R.from_euler('xyz',euler.squeeze())
      Ri2b = Rb2i.inv()

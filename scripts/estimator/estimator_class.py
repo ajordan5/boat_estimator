@@ -3,7 +3,7 @@ import numpy as np
 import math
 
 import sys
-sys.path.append('/home/matt/px4_ws/src/boat_estimator/src/structs')
+sys.path.append('/home/alex/rtk_ws/src/boat_estimator/src/structs')
 
 import ekf
 import comp_filter
@@ -27,6 +27,8 @@ class Estimator:
       self.firstImu = True
 
    def imu_callback(self,imu):
+      """Each time an IMU measurment is received, estimate base roll/pitch with complementary filter,
+      update the base states and propogate the state in the EKF"""
       if self.firstImu:
          self.imuPrevTime = imu.time
          self.firstImu = False
@@ -93,7 +95,7 @@ class Estimator:
    def gps_compass_callback(self,gpsCompass):
       if gpsCompass.flags[1] != '1':
       #if gpsCompass.flags[-3] != '1':
-         print('Compass not valid = ', gpsCompass.flags)
+         #print('Compass not valid = ', gpsCompass.flags)
          return
       zt = gpsCompass.heading
       ht = ekf.update_rtk_compass_model(self.belief.psi)

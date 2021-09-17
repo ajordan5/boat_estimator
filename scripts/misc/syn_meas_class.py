@@ -6,7 +6,7 @@ import navpy
 from scipy.spatial.transform import Rotation as R
 
 import sys
-sys.path.append('/home/matt/px4_ws/src/boat_estimator/scripts/structs')
+sys.path.append('/home/alex/rtk_ws/src/boat_estimator/scripts/structs')
 
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Imu
