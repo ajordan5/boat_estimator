@@ -48,7 +48,7 @@ class Estimator:
    def relPos_callback(self,relPos):
       flagsBinary = bin(relPos.flags)
       if flagsBinary[-3] != '1':
-         print('relPos not valid = ', relPos.flags)
+         #print('relPos not valid = ', relPos.flags)
          return
       zt = relPos.base2RoverRelPos
       ht = ekf.update_rtk_relPos_model(self.belief.p,self.baseStates.euler,self.params.antennaOffset)
@@ -58,7 +58,7 @@ class Estimator:
 
    def rover_gps_callback(self,gps):
       if gps.fix != 3:
-         print('rover gps not in fix.  Fix = ', gps.fix)
+         #print('rover gps not in fix.  Fix = ', gps.fix)
          return
       if not self.refLlaSet:
          self.latRef = gps.lla[0]

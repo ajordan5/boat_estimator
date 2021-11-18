@@ -45,10 +45,11 @@ sigmaGps: [0.4,     #horizontal
 
 compFiltKp: 0.4,
 
-antennaOffset: [0.735,-0.851,-0.086], #mocap
-#antennaOffset: [0.74,-0.73,0.11],
+#antennaOffset: [0.735,-0.851,-0.086], #mocap
+antennaOffset: [0.667387,-0.760626,0.356398], # Most recent calibration w/ new arms
+#antennaOffset: [0.74,-0.73,0.11], # Matts previous calibration
 #antennaOffset: [0.76,-0.77,0.04],
-#antennaOffset: [0.0,0.0,0.0],
+#antennaOffset: [0.0,0.0,0.0], # Setting this for mocap landings without an offset
 
 accelBias: [0.12,-0.07,0.28],
 gyroBias: [0.0,0.0,0.0]
