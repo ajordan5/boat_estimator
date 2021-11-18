@@ -6,7 +6,7 @@ import sys
 sys.path.append('/home/alex/rtk_ws/src/boat_estimator/src/structs')
 
 import ekf
-import comp_filter
+from comp_filter import compFilter
 from belief import Belief
 from dynamic_model import DynamicModel
 from inputs import Inputs
@@ -25,25 +25,34 @@ class Estimator:
       self.refEcef = np.zeros((3,1))
       self.imuPrevTime = 0.0
       self.firstImu = True
+      self.compFilter = compFilter(self.params.kp, self.params.ki)
 
    def imu_callback(self,imu):
       """Each time an IMU measurment is received, estimate base roll/pitch with complementary filter,
       update the base states and propogate the state in the EKF"""
+
       if self.firstImu:
          self.imuPrevTime = imu.time
          self.firstImu = False
          return
+
+      # Run the complementary filter to estimate roll and pitch of the boat
       dt = imu.time - self.imuPrevTime
       self.imuPrevTime = imu.time
+      phi, theta, bias = self.compFilter.run(self.baseStates,imu,dt)
 
-      ut = Inputs(comp_filter.run(self.baseStates,imu,dt,self.params.kp))
+      # Inputs for the EKF dynamic model
+      ut = Inputs([imu.accelerometers.item(0),imu.accelerometers.item(1),imu.accelerometers.item(2), \
+                  imu.gyros.item(0),imu.gyros.item(1),imu.gyros.item(2), \
+                  np.array([phi]), np.array([theta])])
       self.baseStates.update_w_lpf(ut.gyros)
       ft = DynamicModel(ekf.update_dynamic_model(self.belief,ut))
       At = ekf.update_jacobian_A(self.belief,ut)
       Bt = ekf.update_jacobian_B(self.belief,ut)
-
       ekf.propagate(self.belief,self.params.RProcess,self.params.RInputs,ft,At,Bt,dt)
-      self.update_full_state(ut.phi,ut.theta)
+
+      # Update the state belief based on dynamics propogation
+      self.baseStates.update_state(self.belief, phi, theta, bias)
 
    def relPos_callback(self,relPos):
       if relPos.flags[-3] != '1':
