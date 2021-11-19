@@ -10,7 +10,7 @@ def run(baseStates,imu,dt,kp):
                                   [0.0, cphi, -sphi],
                                   [0.0, sphi/cth, cphi/cth]])
                                   
-     # aBody = imu.accelerometers #This was negative
+     # Euler as estimated by the accelerometers
      eulerAccel = np.array([[0.0,0.0,0.0]]).T
      eulerAccel[0][0] = np.arctan(imu.accelerometers.item(1)/imu.accelerometers.item(2)) #switched from arctan2 to arctan
      if imu.accelerometers.item(0) > 9.8:
@@ -22,6 +22,9 @@ def run(baseStates,imu,dt,kp):
      eulerAccel[1][0] = np.arcsin(imu.accelerometers.item(0)/9.81)
      eulerAccel[2][0] = baseStates.euler.item(2) #We update this with rtk compassing
      eulerError = eulerAccel - baseStates.euler
+
+     # Bias
+     bias = bias_prev - dt*ki*eulerError
 
      dEuler = attitudeModelInversion @ imu.gyros + kp*eulerError
      
