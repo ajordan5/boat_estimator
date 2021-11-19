@@ -44,7 +44,7 @@ sigmaGps: [0.4,     #horizontal
            0.02],   #rtk compass
 
 compFiltKp: 0.4,
-compFiltKp: 0.0,
+compFiltKi: 0.1,
 
 #antennaOffset: [0.735,-0.851,-0.086], #mocap
 antennaOffset: [0.667387,-0.760626,0.356398], # Most recent calibration w/ new arms
