@@ -13,6 +13,13 @@ from inputs import Inputs
 from base_states import BaseStates
 
 class Estimator:
+   
+   """Manage all components of state estimation for multi-rotor and landing platform. Class containing callbacks
+   for all sensor readings.
+   
+   - IMU Measurement -> Estimate roll and pitch with complementary filter, propogate dynamics according to IMU
+   - All other measurements -> Kalman filter correction based on sensor reading"""
+
    def __init__(self,params):
       self.params = params
       self.belief = Belief(self.params.p0,self.params.vr0,self.params.psi0,self.params.vb0,self.params.P0)
@@ -28,6 +35,9 @@ class Estimator:
       self.alpha = 0.05
 
    def imu_callback(self,imu):
+      """Each time an IMU measurment is received, estimate base roll/pitch with complementary filter,
+      update the base states and propogate the state in the EKF"""
+
       if self.firstImu:
          self.imuPrevTime = imu.time
          self.firstImu = False

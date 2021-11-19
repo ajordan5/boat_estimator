@@ -26,6 +26,10 @@ from estimator_params_class import EstimatorParams
 from estimator_class import Estimator
 
 class EstimatorRos:
+
+    """Class to manage state estimation in ros. Subscribe to messages needed for estimation, execute callbacks in estimator_class.py
+     and publish the estimator output"""
+
     def __init__(self):
         self.relPosEstimate = Vector3Stamped()
         self.odomEstimate = Odometry()
