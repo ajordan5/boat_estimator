@@ -36,7 +36,7 @@ class Estimator:
       dt = imu.time - self.imuPrevTime
       self.imuPrevTime = imu.time
 
-      ut = Inputs(comp_filter.run(self.baseStates,imu,dt,self.params.kp))
+      ut = Inputs(comp_filter.run(self.baseStates,imu,dt,self.params.kp, self.params.ki))
       self.baseStates.update_w_lpf(ut.gyros)
       ft = DynamicModel(ekf.update_dynamic_model(self.belief,ut))
       At = ekf.update_jacobian_A(self.belief,ut)

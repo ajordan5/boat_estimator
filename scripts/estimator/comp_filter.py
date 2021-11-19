@@ -1,6 +1,6 @@
 import numpy as np
 
-def run(baseStates,imu,dt,kp):
+def run(baseStates,imu,dt,kp, ki):
      #I added the attitude model inversion.  It seemed to help.  It is not from Dr. Beard
      sphi = np.sin(baseStates.euler.item(0))
      cphi = np.cos(baseStates.euler.item(0))
@@ -24,9 +24,9 @@ def run(baseStates,imu,dt,kp):
      eulerError = eulerAccel - baseStates.euler
 
      # Bias
-     bias = bias_prev - dt*ki*eulerError
+     baseStates.bias -= dt*ki*eulerError
 
-     dEuler = attitudeModelInversion @ imu.gyros + kp*eulerError
+     dEuler = (attitudeModelInversion @ imu.gyros - baseStates.bias) + kp*eulerError
      
      phi = baseStates.euler.item(0) + dEuler.item(0)*dt
      theta = baseStates.euler.item(1) + dEuler.item(1)*dt

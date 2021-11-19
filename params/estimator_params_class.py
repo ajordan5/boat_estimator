@@ -65,6 +65,7 @@ class EstimatorParams:
         self.QtRtkCompass = np.array([[sigmaGps[5]**2]]) # rtk compass heading
 
         self.kp = rospy.get_param('~compFiltKp',0.1)
+        self.ki = rospy.get_param('~compFiltKi',0.0)
 
         self.antennaOffset = np.array([rospy.get_param('~antennaOffset',[0.74,-0.73,0.11])]).T
 
