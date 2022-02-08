@@ -16,7 +16,7 @@ class Estimator:
    def __init__(self,params):
       self.params = params
       self.belief = Belief(self.params.p0,self.params.vr0,self.params.psi0,self.params.vb0,self.params.P0)
-      self.baseStates = BaseStates(self.params.p0,self.params.euler0,self.params.vb0)
+      self.baseStates = BaseStates(self.params.p0,self.params.euler0,self.params.vb0, self.params.vr0)
       self.wLpf = np.zeros((3,1))
       self.refLlaSet = False
       self.latRef = 0.0
@@ -109,11 +109,14 @@ class Estimator:
       ekf.update(self.belief,self.params.QtRtkCompass,zt,ht,Ct)
 
    def update_full_state(self,phi,theta):
+      # Update all states from ekf belief that are to be published
       self.baseStates.p = self.belief.p
       self.baseStates.euler = np.array([[phi.squeeze(),theta.squeeze(),self.belief.psi.squeeze()]]).T
       Rb2i = R.from_euler('xyz',self.baseStates.euler.squeeze())
       newVb = Rb2i.apply(self.belief.vb.T).T
       self.baseStates.vb = self.low_pass_filter(newVb,self.baseStates.vb)
+      newVr = self.belief.vr
+      self.baseStates.vr = self.low_pass_filter(newVr,self.baseStates.vr)
 
    def low_pass_filter(self,new,old):
       filtered = self.alpha*new+(1-self.alpha)*old
