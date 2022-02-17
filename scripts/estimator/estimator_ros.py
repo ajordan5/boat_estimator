@@ -3,10 +3,9 @@
 import numpy as np
 import rospy
 from scipy.spatial.transform import Rotation as R
-
 import sys
-sys.path.append('/home/rhodey/px4_ws/src/boat_estimator/scripts/structs')
-sys.path.append('/home/rhodey/px4_ws/src/boat_estimator/params')
+sys.path.append('../rtk_ws/src/boat_estimator/scripts/structs')
+sys.path.append('../rtk_ws/src/boat_estimator/params')
 #sys.path.append('/home/matt/px4_ws/src/boat_estimator/scripts/structs')
 #sys.path.append('/home/matt/px4_ws/src/boat_estimator/params')
 

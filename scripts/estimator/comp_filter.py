@@ -12,6 +12,7 @@ def run(baseStates,imu,dt,kp, ki):
                                   
      # Euler as estimated by the accelerometers
      eulerAccel = np.array([[0.0,0.0,0.0]]).T
+     #print(imu.accelerometers)
      eulerAccel[0][0] = np.arctan(imu.accelerometers.item(1)/imu.accelerometers.item(2)) #switched from arctan2 to arctan
      if imu.accelerometers.item(0) > 9.8:
           print("accelerometer forward value too high, ", imu.accelerometers)
@@ -25,7 +26,6 @@ def run(baseStates,imu,dt,kp, ki):
 
      # Bias
      baseStates.bias -= dt*ki*eulerError
-
      dEuler = (attitudeModelInversion @ imu.gyros - baseStates.bias) + kp*eulerError
      # print(dEuler.T)
      # print(eulerError.T)
