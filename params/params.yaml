@@ -55,8 +55,8 @@ compFiltKi: 0.005,
 
 # Current Offsets
 #antennaOffset: [0.64,-0.78, 0.33], # Most recent calibration, hardware offset
-#antennaOffset: [0.0,0.0,0.0], # Offset for mocap
-antennaOffset: [0.0,0.0,-1.25], # Offset for simulation
+antennaOffset: [0.0,0.0,0.0], # Offset for mocap
+#antennaOffset: [0.0,0.0,-1.25], # Offset for simulation
 
 accelBias: [0.12,-0.07,0.28],
 gyroBias: [0.0,0.0,0.0]
