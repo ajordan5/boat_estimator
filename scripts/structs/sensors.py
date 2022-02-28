@@ -38,3 +38,9 @@ class GpsCompassMsg:
     def __init__(self,headingRad = 0.0,flags = '0b00000000'):
         self.heading = np.array([[headingRad]]).T
         self.flags = flags
+
+class ApriltagMsg:
+    def __init__(self,apriltag):
+        self.position = apriltag.pose.pose.pose.position
+        self.orientation = apriltag.pose.pose.pose.orientation
+        self.t = np.array([[self.position.x, self.position.y, self.position.z]]).T

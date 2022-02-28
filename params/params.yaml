@@ -43,6 +43,8 @@ sigmaGps: [0.4,     #horizontal
            0.04,    #rtk veritical
            0.02],   #rtk compass
 
+sigmaApriltag: .015, # Apriltag xyz
+
 compFiltKp: 0.3,
 compFiltKi: 0.005,
 
@@ -57,6 +59,8 @@ compFiltKi: 0.005,
 #antennaOffset: [0.64,-0.78, 0.33], # Most recent calibration, hardware offset
 antennaOffset: [0.0,0.0,0.0], # Offset for mocap
 #antennaOffset: [0.0,0.0,-1.25], # Offset for simulation
+
+cameraOffset: [0.0,0.0,0.0],
 
 accelBias: [0.12,-0.07,0.28],
 gyroBias: [0.0,0.0,0.0]

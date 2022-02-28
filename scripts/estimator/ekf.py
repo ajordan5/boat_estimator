@@ -64,6 +64,12 @@ def update_rtk_compass_model(psiHat,zPsi):
           ht = psiHat
      return ht
 
+def update_apriltag_model(p, Rm2i, cameraOffset):
+     # Expected output of apriltag reading from multirotor with attitude Rm and translation between camera and multirotor tm
+     Ri2m = Rm2i.inv()
+     ht = Ri2m.apply(p.T).T - cameraOffset
+     return ht
+
 def update_jacobian_A(belief,ut):
      sphi = np.sin(ut.phi).squeeze()
      cphi = np.cos(ut.phi).squeeze()
@@ -152,19 +158,10 @@ def update_jacobian_B(belief,ut):
      return Bt
 
 def get_jacobian_C_relPos(baseStates,antennaOffset):
-     sphi = np.sin(baseStates.euler[0]).squeeze()
-     cphi = np.cos(baseStates.euler[0]).squeeze()
-     sth = np.sin(baseStates.euler[1]).squeeze()
-     cth = np.cos(baseStates.euler[1]).squeeze()
-     tth = np.tan(baseStates.euler[1]).squeeze()
-     spsi = np.sin(baseStates.euler[2]).squeeze()
-     cpsi = np.cos(baseStates.euler[2]).squeeze()
 
      dyDp = -np.identity(3)
      dyDvr = np.zeros((3,3))
-     dyDpsi = np.array([[(-cth*sphi)*antennaOffset.item(0) + (-sphi*sth*spsi-cphi*cpsi)*antennaOffset.item(1) + (-cphi*sth*spsi+sphi*cpsi)*antennaOffset.item(2)],
-                        [(cth*cpsi)*antennaOffset.item(0) + (sphi*sth*cpsi-cphi*spsi)*antennaOffset.item(1) + (cphi*sth*cpsi+sphi*spsi)*antennaOffset.item(2)],
-                        [0.0]])
+     dyDpsi = Rb2i_dot(baseStates.euler) @ antennaOffset
      dyDvb = np.zeros((3,3))
      Ct = np.concatenate((dyDp,dyDvr,dyDpsi,dyDvb),axis=1)
      
@@ -180,20 +177,10 @@ def get_jacobian_C_rover_velocity():
      return Ct
 
 def get_jacobian_C_base_velocity(euler,vb):
-     sphi = np.sin(euler.item(0))
-     cphi = np.cos(euler.item(0))
-     sth = np.sin(euler.item(1))
-     cth = np.cos(euler.item(1))
-     spsi = np.sin(euler.item(2))
-     cpsi = np.cos(euler.item(2))
-
      Rb2i = R.from_euler('xyz',euler.squeeze())
-
      dyDp = np.zeros((3,3))
      dyDvr = np.zeros((3,3))
-     dyDpsi = np.array([[(-cth*sphi)*vb.item(0) + (-sphi*sth*spsi-cphi*cpsi)*vb.item(1) + (-cphi*sth*spsi+sphi*cpsi)*vb.item(2)],
-                        [(cth*cpsi)*vb.item(0) + (sphi*sth*cpsi-cphi*spsi)*vb.item(1) + (cphi*sth*cpsi+sphi*spsi)*vb.item(2)],
-                        [0.0]])
+     dyDpsi = Rb2i_dot(euler) @ vb
      dyDvb = Rb2i.as_matrix()
      Ct = np.concatenate((dyDp,dyDvr,dyDpsi,dyDvb),axis=1)
 
@@ -207,3 +194,26 @@ def get_jacobian_C_compass():
      Ct = np.concatenate((dyDp,dyDvr,dyDpsi,dyDvb),axis=1)
 
      return Ct
+
+def get_jacobian_C_apriltag(Rm2i, euler, p):
+     zero = np.zeros((3,3))
+     dyDvr = zero
+     dyDvb = zero
+     dyDp = Rm2i.as_matrix().T
+     dyDpsi = Rb2i_dot(euler) @ p
+     Ct = np.concatenate((dyDp,dyDvr,dyDpsi,dyDvb),axis=1)
+     return Ct
+
+def Rb2i_dot(euler):
+     # Derivative of the roation matrix from body to inertial for the boat
+     sphi = np.sin(euler.item(0))
+     cphi = np.cos(euler.item(0))
+     sth = np.sin(euler.item(1))
+     cth = np.cos(euler.item(1))
+     spsi = np.sin(euler.item(2))
+     cpsi = np.cos(euler.item(2))
+
+     return np.array([[(-cth*sphi) , (-sphi*sth*spsi-cphi*cpsi) , (-cphi*sth*spsi+sphi*cpsi)],
+                        [(cth*cpsi) , (sphi*sth*cpsi-cphi*spsi) , (cphi*sth*cpsi+sphi*spsi)],
+                        [0.0 , 0.0, 0.0]])
+
