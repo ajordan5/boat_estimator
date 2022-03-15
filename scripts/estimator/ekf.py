@@ -52,11 +52,16 @@ def update_rover_gps_velocity_model(roverVelocityHat):
 
 def update_base_gps_velocity_model(eulerAnglesHat,baseVelocityHat,wLpf,antennaOffset):
      Rb2i = R.from_euler('xyz',eulerAnglesHat.squeeze())
-     ht = Rb2i.apply(baseVelocityHat.T).T + np.cross(wLpf.T,antennaOffset.T).T
+     ht = Rb2i.apply(baseVelocityHat.T).T - np.cross(wLpf.T,antennaOffset.T).T
      return ht
 
-def update_rtk_compass_model(psiHat):
-     ht = psiHat
+def update_rtk_compass_model(psiHat,zPsi):
+     if zPsi-psiHat > np.pi:
+          ht = psiHat + 2.0*np.pi
+     elif zPsi-psiHat < -np.pi:
+          ht = psiHat - 2.0*np.pi
+     else:
+          ht = psiHat
      return ht
 
 def update_jacobian_A(belief,ut):
@@ -174,20 +179,20 @@ def get_jacobian_C_rover_velocity():
 
      return Ct
 
-def get_jacobian_C_base_velocity(baseStates):
-     sphi = np.sin(baseStates.euler.item(0))
-     cphi = np.cos(baseStates.euler.item(0))
-     sth = np.sin(baseStates.euler.item(1))
-     cth = np.cos(baseStates.euler.item(1))
-     spsi = np.sin(baseStates.euler.item(2))
-     cpsi = np.cos(baseStates.euler.item(2))
+def get_jacobian_C_base_velocity(euler,vb):
+     sphi = np.sin(euler.item(0))
+     cphi = np.cos(euler.item(0))
+     sth = np.sin(euler.item(1))
+     cth = np.cos(euler.item(1))
+     spsi = np.sin(euler.item(2))
+     cpsi = np.cos(euler.item(2))
 
-     Rb2i = R.from_euler('xyz',baseStates.euler.squeeze())
+     Rb2i = R.from_euler('xyz',euler.squeeze())
 
      dyDp = np.zeros((3,3))
      dyDvr = np.zeros((3,3))
-     dyDpsi = np.array([[(-cth*sphi)*baseStates.vb.item(0) + (-sphi*sth*spsi-cphi*cpsi)*baseStates.vb.item(1) + (-cphi*sth*spsi+sphi*cpsi)*baseStates.vb.item(2)],
-                        [(cth*cpsi)*baseStates.vb.item(0) + (sphi*sth*cpsi-cphi*spsi)*baseStates.vb.item(1) + (cphi*sth*cpsi+sphi*spsi)*baseStates.vb.item(2)],
+     dyDpsi = np.array([[(-cth*sphi)*vb.item(0) + (-sphi*sth*spsi-cphi*cpsi)*vb.item(1) + (-cphi*sth*spsi+sphi*cpsi)*vb.item(2)],
+                        [(cth*cpsi)*vb.item(0) + (sphi*sth*cpsi-cphi*spsi)*vb.item(1) + (cphi*sth*cpsi+sphi*spsi)*vb.item(2)],
                         [0.0]])
      dyDvb = Rb2i.as_matrix()
      Ct = np.concatenate((dyDp,dyDvr,dyDpsi,dyDvb),axis=1)

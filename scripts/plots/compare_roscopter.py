@@ -6,14 +6,14 @@ import numpy as np
 import navpy
 
 def main():
-	odomTopic = '/base_odom'
+	odomTopic = '/new/base_odom'
 	truthTopic = '/dummyTopic'
 	mocapTopic = '/dummyTopic'
-	imuTopic = '/boat/imu'
+	imuTopic = '/base/imu'
 	ubloxRelPosTopic = '/rover/RelPos'
-	baseGpsTopic = '/boat/PosVelEcef'
+	baseGpsTopic = '/base/PosVelEcef'
 	roverGpsTopic = '/rover/PosVelEcef'
-	rtkCompassTopic = '/boat/compass/RelPos'
+	rtkCompassTopic = '/base/compass/RelPos'
 	data = Parser(odomTopic,truthTopic,mocapTopic,imuTopic,ubloxRelPosTopic,baseGpsTopic,roverGpsTopic,rtkCompassTopic)
 	filename = 'compare_roscopter.bag'
 	bag = rosbag.Bag('/home/matt/data/px4flight/sim/' + filename)

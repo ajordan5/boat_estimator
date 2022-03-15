@@ -1,25 +1,27 @@
 <?xml version="1.0"?>
 
 <launch>
-    <arg name="bag_in_filename"     value="flightC"/>
+    <arg name="bag_in_filename"     value="flightE"/>
     <arg name="bag_out_filename"    value="compare_roscopter"/>
-    <arg name="boat_imu"            value="/boat/imu"/>
+    <arg name="boat_imu"            value="/base/imu"/>
     <arg name="base_2_rover_relPos" value="/rover/RelPos"/>
     <arg name="rover_PosVelEcef"    value="/rover/PosVelEcef"/>
-    <arg name="boat_PosVelEcef"     value="/boat/PosVelEcef"/>
-    <arg name="compass_relPos"      value="/boat/compass/RelPos"/>
+    <arg name="boat_PosVelEcef"     value="/base/PosVelEcef"/>
+    <arg name="compass_relPos"      value="/base/compass/RelPos"/>
     <arg name="params_file"         value="params"/>
 
-    <node pkg="rosbag" type="play" name="player" output="screen" args="--clock ../data/px4flight/outdoor/0318/$(arg bag_in_filename).bag"/>
+    <node pkg="rosbag" type="play" name="player" output="screen" args="--clock ../data/px4flight/outdoor/0420/$(arg bag_in_filename).bag"/>
 
-    <include file="$(find boat_estimator)/launch/standard.launch">
-        <arg name="boat_imu"            value="$(arg boat_imu)"/>
-        <arg name="base_2_rover_relPos" value="$(arg base_2_rover_relPos)"/>
-        <arg name="rover_PosVelEcef"    value="$(arg rover_PosVelEcef)"/>
-        <arg name="boat_PosVelEcef"     value="$(arg boat_PosVelEcef)"/>
-        <arg name="compass_relPos"      value="$(arg compass_relPos)"/>
-        <arg name="params_file"         value="$(arg params_file)"/>
-    </include>
+    <group ns="new">
+        <include file="$(find boat_estimator)/launch/standard.launch">
+            <arg name="boat_imu"            value="$(arg boat_imu)"/>
+            <arg name="base_2_rover_relPos" value="$(arg base_2_rover_relPos)"/>
+            <arg name="rover_PosVelEcef"    value="$(arg rover_PosVelEcef)"/>
+            <arg name="boat_PosVelEcef"     value="$(arg boat_PosVelEcef)"/>
+            <arg name="compass_relPos"      value="$(arg compass_relPos)"/>
+            <arg name="params_file"         value="$(arg params_file)"/>
+        </include>
+    </group>
 
     <node pkg="rosbag" type="record" name="record" output="screen" args="-O ../data/px4flight/sim/$(arg bag_out_filename).bag --all"/>
 </launch>

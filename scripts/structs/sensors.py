@@ -18,6 +18,10 @@ class ImuMsg:
         self.accelerometers = np.array([accelerometersMetersPerSecondSquared]).T
         self.gyros = np.array([gyrosRadiansPerSecond]).T
 
+    def remove_bias(self,accelBias,gyroBias):
+        self.accelerometers -= accelBias
+        self.gyros -= gyroBias
+
 class RelPosMsg:
     def __init__(self,base2RoverRelativePositionNedMeters = [0.0,0.0,0.0],flags = '0b00000000'):
         self.base2RoverRelPos = np.array([base2RoverRelativePositionNedMeters]).T
