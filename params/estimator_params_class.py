@@ -64,18 +64,20 @@ class EstimatorParams:
 
         self.QtRtkCompass = np.array([[sigmaGps[5]**2]]) # rtk compass heading
         
-        sigmaApriltag = rospy.get_param('~sigmaApriltag', 0.01)
+        sigmaApriltag = rospy.get_param('~sigmaApriltag', 0.05)
         self.QtApriltag = np.diag([
                     sigmaApriltag**2, # x
                     sigmaApriltag**2, # y
                     sigmaApriltag**2, # z
                     ])
+        self.apriltagID = rospy.get_param('~apriltagID', 1)
 
         self.kp = rospy.get_param('~compFiltKp',0.1)
         self.ki = rospy.get_param('~compFiltKi',0.0)
 
         self.antennaOffset = np.array([rospy.get_param('~antennaOffset',[0.74,-0.73,0.11])]).T
         self.cameraOffset = np.array([rospy.get_param('~cameraOffset',[0.0,0.0,0.0])]).T
+        self.cameraRotation = np.array(rospy.get_param('~cameraRotation',[0.0,0.0,0.0]))
 
         self.accelBias = np.array([rospy.get_param('~accelBias',[0.0,0.0,0.0])]).T
         self.gyroBias = np.array([rospy.get_param('~gyroBias',[0.0,0.0,0.0])]).T

@@ -22,6 +22,7 @@ from apriltag_ros.msg import AprilTagDetectionArray
 
 class EstimatorRos:
     def __init__(self):
+        
         self.relPosEstimate = Vector3Stamped()
         self.odomEstimate = Odometry()
         self.roverAttitude = np.array([0.,0.,0.,1])
@@ -29,6 +30,10 @@ class EstimatorRos:
         self.eulerEstimate = Vector3Stamped()
         params = EstimatorParams()
         self.estimator = Estimator(params)
+        
+        self.apriltagID = params.apriltagID
+        self.Rc2m = R.from_euler('xyz', params.cameraRotation, degrees=True)
+        print(self.Rc2m.as_matrix())
 
         self.boat_estimate_pub_ = rospy.Publisher('base_odom', Odometry, queue_size=5, latch=True)
         self.relative_velocity_pub_ = rospy.Publisher('rel_vel', Odometry, queue_size=5, latch=True)
@@ -95,10 +100,11 @@ class EstimatorRos:
     def aprilTagCallback(self,msg):
         # Update state with apriltag if you locate the specific tag from the boat
         for detection in msg.detections:
-            if detection.id == (42,):
+            if detection.id == (self.apriltagID,):
                 Rm2i = R.from_quat(self.roverAttitude)
+                Rc2i = Rm2i.as_matrix() @ self.Rc2m.as_matrix() 
                 apriltag = ApriltagMsg(detection)
-                self.estimator.apriltag_callback(apriltag.t, Rm2i)
+                self.estimator.apriltag_callback(apriltag.t, R.from_matrix(Rc2i))
 
     def publish_estimates(self):
         timeStamp = rospy.Time.now()

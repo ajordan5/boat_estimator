@@ -115,6 +115,8 @@ class Estimator:
       Ct = ekf.get_jacobian_C_apriltag(Rm2i, self.baseStates.euler, self.belief.p)
       #print("z: ", zt.T)
       #print("zhat: ", ht.T)
+      print(zt)
+      print(ht)
       ekf.update(self.belief,self.params.QtApriltag,zt,ht,Ct)
 
    def update_full_state(self,phi,theta):
