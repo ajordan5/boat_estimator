@@ -43,8 +43,8 @@ sigmaGps: [0.4,     #horizontal
            0.04,    #rtk veritical
            0.02],   #rtk compass
 
-sigmaApriltag: .015, # Apriltag xyz
-apriltagID: 42,
+sigmaApriltag: .01, # Apriltag xyz
+apriltagID: 0,
 
 compFiltKp: 0.3,
 compFiltKi: 0.005,

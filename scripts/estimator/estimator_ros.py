@@ -4,10 +4,14 @@ import numpy as np
 import rospy
 from scipy.spatial.transform import Rotation as R
 import sys
+import os
+print(os.getcwd())
 sys.path.append('../rtk_ws/src/boat_estimator/scripts/structs')
 sys.path.append('../rtk_ws/src/boat_estimator/params')
-#sys.path.append('/home/matt/px4_ws/src/boat_estimator/scripts/structs')
-#sys.path.append('/home/matt/px4_ws/src/boat_estimator/params')
+
+# Path for hardware
+sys.path.append('/home/rhodey/px4_ws/src/boat_estimator/scripts/structs')
+sys.path.append('/home/rhodey/px4_ws/src/boat_estimator/params')
 
 from geometry_msgs.msg import Vector3Stamped, PoseWithCovarianceStamped
 from sensor_msgs.msg import Imu
@@ -103,6 +107,7 @@ class EstimatorRos:
             if detection.id == (self.apriltagID,):
                 Rm2i = R.from_quat(self.roverAttitude)
                 Rc2i = Rm2i.as_matrix() @ self.Rc2m.as_matrix() 
+                print(Rc2i)
                 apriltag = ApriltagMsg(detection)
                 self.estimator.apriltag_callback(apriltag.t, R.from_matrix(Rc2i))
 
