@@ -83,6 +83,9 @@ class EstimatorRos:
         self.roverAttitude[1] = msg.pose.pose.orientation.y 
         self.roverAttitude[2] = msg.pose.pose.orientation.z 
         self.roverAttitude[3] = msg.pose.pose.orientation.w 
+        # print(self.roverAttitude)
+        # Rm2i = R.from_quat(self.roverAttitude)
+        # print(Rm2i.as_euler('xyz', degrees=True))
        
     
     def basePosVelEcefCallback(self,msg):
@@ -106,8 +109,9 @@ class EstimatorRos:
         for detection in msg.detections:
             if detection.id == (self.apriltagID,):
                 Rm2i = R.from_quat(self.roverAttitude)
+                # print(Rm2i.as_euler('xyz', degrees=True))
                 Rc2i = Rm2i.as_matrix() @ self.Rc2m.as_matrix() 
-                print(Rc2i)
+                # print(Rc2i)
                 apriltag = ApriltagMsg(detection)
                 self.estimator.apriltag_callback(apriltag.t, R.from_matrix(Rc2i))
 
