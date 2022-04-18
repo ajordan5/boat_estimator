@@ -111,14 +111,16 @@ class Estimator:
    def apriltag_callback(self,apriltag,Rtag2i):
       # EKF Correction step for apriltag measurement
       zt = apriltag.t
-      Rc2tag = apriltag.R#.inv()
-      print(Rc2tag.as_euler('xyz', degrees=True))
-      Rc2i = R.from_matrix(Rtag2i.as_matrix()@Rc2tag.as_matrix()) # TODO include rotation from tag to boat frame
+      Rc2tag = apriltag.R
+      # print("c2t: ",Rc2tag.as_matrix()) #as_euler('xyz', degrees=True))
+      # print("t2i: ",Rtag2i.as_matrix()) # euler('xyz', degrees=True))
+      Rc2i = R.from_matrix(Rtag2i.as_matrix()@Rc2tag.as_matrix()) 
+      # print("c2i: ",Rc2i.as_matrix()) #as_euler('xyz', degrees=True))
       ht = ekf.update_apriltag_model(self.belief.p, Rc2i, self.params.cameraOffset)
       Ct = ekf.get_jacobian_C_apriltag(Rc2i, self.baseStates.euler, self.belief.p)
-      #print("z: ", zt.T)
-      #print("zhat: ", ht.T)
-      # ekf.update(self.belief,self.params.QtApriltag,zt,ht,Ct)
+      print("z: ", zt.T)
+      print("zhat: ", ht.T)
+      ekf.update(self.belief,self.params.QtApriltag,zt,ht,Ct)
 
    def update_full_state(self,phi,theta):
       # Update all states from ekf belief that are to be published

@@ -31,6 +31,7 @@ class EstimatorRos:
         self.estimator = Estimator(params)
         
         self.apriltagID = self.estimator.params.apriltagID
+        self.Rtag2b = R.from_euler('xyz', self.estimator.params.tagRotation, degrees=True)
         
         self.boat_estimate_pub_ = rospy.Publisher('base_odom', Odometry, queue_size=5, latch=True)
         self.relative_velocity_pub_ = rospy.Publisher('rel_vel', Odometry, queue_size=5, latch=True)
@@ -41,7 +42,7 @@ class EstimatorRos:
         self.base_pos_vel_ecef_sub_ = rospy.Subscriber('base_posVelEcef', PosVelEcef, self.basePosVelEcefCallback, queue_size=5)
         self.comp_relPos_sub_ = rospy.Subscriber('compass_relPos', RelPos, self.compassRelPosCallback, queue_size=5)
         self.aprilTag_sub_ = rospy.Subscriber('tag_detections', AprilTagDetectionArray, self.aprilTagCallback, queue_size=5)
-        print("HERE",self.apriltagID)
+
         while not rospy.is_shutdown():
             rospy.spin()
 
@@ -90,7 +91,11 @@ class EstimatorRos:
         # Update state with apriltag if you locate the specific tag from the boat
         for detection in msg.detections:
             if detection.id == (self.apriltagID,):
-                Rtag2i = R.from_euler('xyz' ,self.estimator.baseStates.euler.squeeze(), degrees=False) 
+                Rb2i = R.from_euler('xyz' ,self.estimator.baseStates.euler.squeeze(), degrees=False) 
+                # print("b2i: ",Rb2i.as_euler('xyz', degrees=True))
+                # print("t2b: ",self.Rtag2b.as_euler('xyz', degrees=True))
+                Rtag2i = R.from_matrix(Rb2i.as_matrix() @ self.Rtag2b.as_matrix())
+                # print(Rb2i.as_euler('xyz', degrees=True))
                 apriltag = ApriltagMsg(detection)
                 self.estimator.apriltag_callback(apriltag, Rtag2i)
 
