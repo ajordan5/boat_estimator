@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.spatial.transform import Rotation as R
 
 class TruthMsg:
     def __init__(self,timeSeconds = 0.0,positionMetersNed = [0.0,0.0,0.0],orientationRadNed = [0.0,0.0,0.0], \
@@ -44,3 +45,4 @@ class ApriltagMsg:
         self.position = apriltag.pose.pose.pose.position
         self.orientation = apriltag.pose.pose.pose.orientation
         self.t = np.array([[self.position.x, self.position.y, self.position.z]]).T
+        self.R = R.from_quat([self.orientation.x, self.orientation.y, self.orientation.z, self.orientation.w])

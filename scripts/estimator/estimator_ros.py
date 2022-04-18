@@ -25,26 +25,23 @@ class EstimatorRos:
         
         self.relPosEstimate = Vector3Stamped()
         self.odomEstimate = Odometry()
-        self.roverAttitude = np.array([0.,0.,0.,1])
         self.relVel = Odometry()
         self.eulerEstimate = Vector3Stamped()
         params = EstimatorParams()
         self.estimator = Estimator(params)
         
-        self.apriltagID = params.apriltagID
-        self.Rc2m = R.from_euler('xyz', params.cameraRotation, degrees=True)
-        print(self.Rc2m.as_matrix())
-
+        self.apriltagID = self.estimator.params.apriltagID
+        
         self.boat_estimate_pub_ = rospy.Publisher('base_odom', Odometry, queue_size=5, latch=True)
         self.relative_velocity_pub_ = rospy.Publisher('rel_vel', Odometry, queue_size=5, latch=True)
         self.boat_euler_pub_ = rospy.Publisher('base_euler', Vector3Stamped, queue_size=5, latch=True)
         self.imu_sub_ = rospy.Subscriber('imu', Imu, self.imuCallback, queue_size=5)
         self.base_2_rover_relPos_sub_ = rospy.Subscriber('base_2_rover_relPos', RelPos, self.relPosCallback, queue_size=5)
         self.rover_pos_vel_ecef_sub_ = rospy.Subscriber('rover_posVelEcef', PosVelEcef, self.roverPosVelEcefCallback, queue_size=5)
-        self.rover_odom_sub_ = rospy.Subscriber('rover_odom', Odometry, self.roverOdomCallback, queue_size=5)
         self.base_pos_vel_ecef_sub_ = rospy.Subscriber('base_posVelEcef', PosVelEcef, self.basePosVelEcefCallback, queue_size=5)
         self.comp_relPos_sub_ = rospy.Subscriber('compass_relPos', RelPos, self.compassRelPosCallback, queue_size=5)
         self.aprilTag_sub_ = rospy.Subscriber('tag_detections', AprilTagDetectionArray, self.aprilTagCallback, queue_size=5)
+        print("HERE",self.apriltagID)
         while not rospy.is_shutdown():
             rospy.spin()
 
@@ -71,15 +68,7 @@ class EstimatorRos:
         fix = msg.fix
         gps = GpsMsg(positionEcefMeters,velocityEcefMetersPerSecond,latLonAltDegM,fix)
  
-        self.estimator.rover_gps_callback(gps)
-
-    def roverOdomCallback(self,msg):
-        # Rover attitude
-        self.roverAttitude[0] = msg.pose.pose.orientation.x 
-        self.roverAttitude[1] = msg.pose.pose.orientation.y 
-        self.roverAttitude[2] = msg.pose.pose.orientation.z 
-        self.roverAttitude[3] = msg.pose.pose.orientation.w 
-       
+        self.estimator.rover_gps_callback(gps)       
     
     def basePosVelEcefCallback(self,msg):
         positionEcefMeters = msg.position
@@ -101,10 +90,9 @@ class EstimatorRos:
         # Update state with apriltag if you locate the specific tag from the boat
         for detection in msg.detections:
             if detection.id == (self.apriltagID,):
-                Rm2i = R.from_quat(self.roverAttitude)
-                Rc2i = Rm2i.as_matrix() @ self.Rc2m.as_matrix() 
+                Rtag2i = R.from_euler('xyz' ,self.estimator.baseStates.euler.squeeze(), degrees=False) 
                 apriltag = ApriltagMsg(detection)
-                self.estimator.apriltag_callback(apriltag.t, R.from_matrix(Rc2i))
+                self.estimator.apriltag_callback(apriltag, Rtag2i)
 
     def publish_estimates(self):
         timeStamp = rospy.Time.now()
