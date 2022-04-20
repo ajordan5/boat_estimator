@@ -108,16 +108,16 @@ class Estimator:
       
       ekf.update(self.belief,self.params.QtRtkCompass,zt,ht,Ct)
 
-   def apriltag_callback(self,apriltag,Rm2i):
+   def apriltag_callback(self,apriltag,Rc2i):
       # EKF Correction step for apriltag measurement
       zt = apriltag
-      ht = ekf.update_apriltag_model(self.belief.p, Rm2i, self.params.cameraOffset)
-      Ct = ekf.get_jacobian_C_apriltag(Rm2i, self.baseStates.euler, self.belief.p)
-      #print("z: ", zt.T)
-      #print("zhat: ", ht.T)
-      print(zt)
-      print(ht)
-      ekf.update(self.belief,self.params.QtApriltag,zt,ht,Ct)
+      ht = ekf.update_apriltag_model(self.belief.p, Rc2i, self.params.cameraOffset)
+      Ct = ekf.get_jacobian_C_apriltag(Rc2i, self.baseStates.euler, self.belief.p)
+      print("z: ", zt.T)
+      print("zhat: ", ht.T)
+      # print(zt)
+      # print(ht)
+      # ekf.update(self.belief,self.params.QtApriltag,zt,ht,Ct)
 
    def update_full_state(self,phi,theta):
       # Update all states from ekf belief that are to be published

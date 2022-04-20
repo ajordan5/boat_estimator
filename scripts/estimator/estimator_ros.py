@@ -102,7 +102,7 @@ class EstimatorRos:
         for detection in msg.detections:
             if detection.id == (self.apriltagID,):
                 Rm2i = R.from_quat(self.roverAttitude)
-                Rc2i = Rm2i.as_matrix() @ self.Rc2m.as_matrix() 
+                Rc2i = Rm2i.as_matrix() @ self.Rc2m.as_matrix()
                 apriltag = ApriltagMsg(detection)
                 self.estimator.apriltag_callback(apriltag.t, R.from_matrix(Rc2i))
 
