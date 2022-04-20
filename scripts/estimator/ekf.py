@@ -68,8 +68,9 @@ def update_apriltag_model(p, Rm2i, cameraOffset):
      # Expected output of apriltag reading from multirotor with attitude Rm and translation between camera and multirotor tm
      Ri2m = Rm2i.inv()
      ht = Ri2m.apply(p.T).T - cameraOffset
-     # print("h", ht.T)
-     # print("p", p.T)
+     # print("Rm2i: ", Rm2i.as_euler('xyz', degrees=True))
+     # print("offset: ", cameraOffset)
+     # print("p: ", p.T)
      return ht
 
 def update_jacobian_A(belief,ut):
