@@ -230,10 +230,10 @@ def Ri2c_dot(euler):
      spsi = np.sin(euler.item(2))
      cpsi = np.cos(euler.item(2))
 
-     # return np.array([[(-sphi*sth*spsi-cphi*cpsi) , (sphi*sth*cpsi-cphi*spsi) , 0.0 ],
-     #                    [(cth*spsi) , (-cth*cpsi) , 0.0],
-     #                    [ (-cphi*sth*spsi+sphi*cpsi) , (cphi*sth*cpsi+sphi*spsi) , 0.0]])
-     return np.array([[(sphi*sth*spsi+cphi*cpsi) , (-sphi*sth*cpsi+cphi*spsi) , 0.0 ],
-                        [(-cth*spsi) , (cth*cpsi) , 0.0],
+     return np.array([[(-sphi*sth*spsi-cphi*cpsi) , (sphi*sth*cpsi-cphi*spsi) , 0.0 ],
+                        [(cth*spsi) , (-cth*cpsi) , 0.0],
                         [ (-cphi*sth*spsi+sphi*cpsi) , (cphi*sth*cpsi+sphi*spsi) , 0.0]])
+     # return np.array([[(sphi*sth*spsi+cphi*cpsi) , (-sphi*sth*cpsi+cphi*spsi) , 0.0 ],
+     #                    [(-cth*spsi) , (cth*cpsi) , 0.0],
+     #                    [ (-cphi*sth*spsi+sphi*cpsi) , (cphi*sth*cpsi+sphi*spsi) , 0.0]])
 
