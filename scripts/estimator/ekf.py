@@ -64,13 +64,12 @@ def update_rtk_compass_model(psiHat,zPsi):
           ht = psiHat
      return ht
 
-def update_apriltag_model(p, Rm2i, cameraOffset):
+def update_apriltag_model(p, Rc2i, cameraOffset):
      # Expected output of apriltag reading from multirotor with attitude Rm and translation between camera and multirotor tm
-     Ri2m = Rm2i.inv()
-     ht = Ri2m.apply(p.T).T - cameraOffset
-     # print("Rm2i: ", Rm2i.as_euler('xyz', degrees=True))
-     # print("offset: ", cameraOffset)
-     # print("p: ", p.T)
+     Ri2c = Rc2i.inv()
+     ht = Ri2c.apply(p.T).T - cameraOffset
+     # print("h", ht.T)
+     # print("p", p.T)
      return ht
 
 def update_jacobian_A(belief,ut):
@@ -198,12 +197,13 @@ def get_jacobian_C_compass():
 
      return Ct
 
-def get_jacobian_C_apriltag(Rm2i, euler, p):
+def get_jacobian_C_apriltag(Rc2i, euler, p):
      zero = np.zeros((3,3))
      dyDvr = zero
      dyDvb = zero
-     dyDp = Rm2i.as_matrix().T
-     dyDpsi = Rb2i_dot(euler) @ p
+     dyDp = Rc2i.as_matrix().T
+     # dyDpsi = Rb2i_dot(euler) @ p
+     dyDpsi = Ri2c_dot(euler) @ p
      Ct = np.concatenate((dyDp,dyDvr,dyDpsi,dyDvb),axis=1)
      return Ct
 
@@ -219,4 +219,21 @@ def Rb2i_dot(euler):
      return np.array([[(-cth*sphi) , (-sphi*sth*spsi-cphi*cpsi) , (-cphi*sth*spsi+sphi*cpsi)],
                         [(cth*cpsi) , (sphi*sth*cpsi-cphi*spsi) , (cphi*sth*cpsi+sphi*spsi)],
                         [0.0 , 0.0, 0.0]])
+
+
+def Ri2c_dot(euler):
+     # Derivative of the roation matrix from body to inertial for the boat
+     sphi = np.sin(euler.item(0))
+     cphi = np.cos(euler.item(0))
+     sth = np.sin(euler.item(1))
+     cth = np.cos(euler.item(1))
+     spsi = np.sin(euler.item(2))
+     cpsi = np.cos(euler.item(2))
+
+     return np.array([[(-sphi*sth*spsi-cphi*cpsi) , (sphi*sth*cpsi-cphi*spsi) , 0.0 ],
+                        [(cth*spsi) , (-cth*cpsi) , 0.0],
+                        [ (-cphi*sth*spsi+sphi*cpsi) , (cphi*sth*cpsi+sphi*spsi) , 0.0]])
+     # return np.array([[(sphi*sth*spsi+cphi*cpsi) , (-sphi*sth*cpsi+cphi*spsi) , 0.0 ],
+     #                    [(-cth*spsi) , (cth*cpsi) , 0.0],
+     #                    [ (-cphi*sth*spsi+sphi*cpsi) , (cphi*sth*cpsi+sphi*spsi) , 0.0]])
 
