@@ -124,9 +124,9 @@ class EstimatorRos:
         self.at_hat_pub_.publish(self.apriltagHat)
 
         # Expected state based on apriltag reading
-        self.apriltagOdom.pose.pose.position.x = p[0]
-        self.apriltagOdom.pose.pose.position.y = p[1]
-        self.apriltagOdom.pose.pose.position.z = p[2]
+        self.apriltagOdom.pose.pose.position.x = p[0][0]
+        self.apriltagOdom.pose.pose.position.y = p[0][1]
+        self.apriltagOdom.pose.pose.position.z = p[0][2]
 
         self.april_odom_pub_.publish(self.apriltagOdom)
 

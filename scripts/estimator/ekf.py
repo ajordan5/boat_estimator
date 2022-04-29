@@ -203,7 +203,7 @@ def get_jacobian_C_apriltag(Rc2i, euler, p):
      dyDvb = zero
      dyDp = Rc2i.as_matrix().T
      # dyDpsi = Rb2i_dot(euler) @ p
-     dyDpsi = Ri2c_dot(euler) @ p
+     dyDpsi = np.zeros((3,1)) #Ri2c_dot(euler) @ p
      Ct = np.concatenate((dyDp,dyDvr,dyDpsi,dyDvb),axis=1)
      return Ct
 

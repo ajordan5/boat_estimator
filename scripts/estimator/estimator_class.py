@@ -116,12 +116,12 @@ class Estimator:
       p_apriltag = self.inverse_apriltag(zt,Rc2i)
       # print("z: ", zt.T)
       # print("zhat: ", ht.T)
-      # ekf.update(self.belief,self.params.QtApriltag,zt,ht,Ct)
+      ekf.update(self.belief,self.params.QtApriltag,zt,ht,Ct)
       return ht, p_apriltag
 
    def inverse_apriltag(self, apriltag, Rc2i):
       """Calculate the pose based solely on apriltag for debugging"""
-      return Rc2i.apply(apriltag+self.params.cameraOffset)
+      return Rc2i.apply((apriltag+self.params.cameraOffset).T)
 
 
    def update_full_state(self,phi,theta):
